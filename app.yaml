@@ -1,0 +1,15 @@
+consul:
+  host: http://193.168.1.201:8500
+  datacenter: beijing
+  service:
+    name: msg-center
+    tags:
+    - msg-center
+    - http
+    port: 8080
+    id: msg-center-1
+  services:
+    - AppServer
+  keys:
+    - beijing.okr.sqldb.mattermost
+ip: 196.168.1.43:8080
