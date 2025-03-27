@@ -1,14 +1,32 @@
 package config
 
+import "fmt"
+
 type SqlDb struct {
-	Id      string   `json:"id"`
-	Schema  string   `json:"schema"`
-	Hosts   []string `json:"hosts"`
-	Account `json:"account"`
+	Host         string `json:"host"`
+	Port         string `json:"port"`
+	User         string `json:"user"`
+	Password     string `json:"password"`
+	Database     string `json:"database"`
+	Schema       string `json:"schema"`
+	MaxIdleConns int    `json:"max_idle_conns"`
+	MaxOpenConns int    `json:"max_open_conns"`
+	SSLMode      string `json:"ssl_mode"`
 }
 
-type Account struct {
-	Encrypt  bool   `json:"encrypt"`
-	User     string `json:"user"`
-	Password string `json:"password"`
+func (c *SqlDb) Dsn() string {
+	sslMode := "disable"
+	if c.SSLMode != "" {
+		sslMode = c.SSLMode
+	}
+
+	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s search_path=%s sslmode=%s",
+		c.Host,
+		c.Port,
+		c.User,
+		c.Password,
+		c.Database,
+		c.Schema,
+		sslMode,
+	)
 }

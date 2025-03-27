@@ -21,6 +21,7 @@ func (s *Server) init() *Server {
 	s.fiberLoader()
 	s.staticConfigLoader()
 	s.consulLoader()
+	s.dbLoader()
 	return s
 
 }

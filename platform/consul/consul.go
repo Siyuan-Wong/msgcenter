@@ -5,8 +5,10 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"github.com/bytedance/sonic"
 	"log"
 	"log/slog"
+	"msgcenter/platform/consul/config"
 	"sync"
 	"time"
 
@@ -358,8 +360,27 @@ func (c *Client) GetServiceInstances(serviceName string) []*api.ServiceEntry {
 
 func (c *Client) GetConfigValue(key string) []byte {
 	c.mu.RLock()
-	defer c.mu.RUnlock()
-	return c.kvCache[key]
+	value, exists := c.kvCache[key]
+	c.mu.RUnlock()
+
+	if !exists {
+		// Attempt to sync from remote if not in cache
+		kv, _, err := c.client.KV().Get(key, nil)
+		if err != nil {
+			slog.Error("远程获取配置失败", "key", key, "error", err)
+			return nil
+		}
+
+		if kv != nil {
+			c.mu.Lock()
+			c.kvCache[key] = kv.Value
+			c.keyVersions[key] = kv.ModifyIndex
+			c.mu.Unlock()
+			return kv.Value
+		}
+		return nil
+	}
+	return value
 }
 
 // 工具函数
@@ -380,4 +401,15 @@ func keys[K comparable, V any](m map[K]V) []K {
 		keys = append(keys, k)
 	}
 	return keys
+}
+
+func (c *Client) GetSqldb() config.SqlDb {
+	var sqldb config.SqlDb
+	err := sonic.Unmarshal(c.GetConfigValue("datacenter/sqldb"), &sqldb)
+	if err != nil {
+		slog.Error(err.Error())
+		panic(err)
+	}
+	slog.Info("获取配置成功", slog.Any("config", sqldb))
+	return sqldb
 }

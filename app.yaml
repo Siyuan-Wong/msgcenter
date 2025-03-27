@@ -1,5 +1,5 @@
 consul:
-  host: http://193.168.1.201:8500
+  host: http://196.168.1.43:8500
   datacenter: beijing
   service:
     name: msg-center
@@ -11,5 +11,5 @@ consul:
   services:
     - AppServer
   keys:
-    - beijing.okr.sqldb.mattermost
+    - datacenter/sqldb
 ip: 196.168.1.43:8080

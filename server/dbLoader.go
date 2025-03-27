@@ -1,17 +1,17 @@
 package server
 
 import (
-	"github.com/bytedance/sonic"
+	"entgo.io/ent/dialect/sql"
 	"log/slog"
-	"msgcenter/platform/consul/config"
+	"msgcenter/ent"
 )
 
 func (s *Server) dbLoader() {
-	// 获取配置
-	var config config.SqlDb
-	err := sonic.Unmarshal(s.Consul.GetConfigValue("beijing.okr.sqldb.mattermost"), &config)
+	config := s.Consul.GetSqldb()
+	dsn := config.Dsn()
+	drv, err := ent.Open("postgres", dsn)
 	if err != nil {
-		slog.Error(err.Error())
+		slog.Error("failed opening connection to postgres: %v", err)
 		panic(err)
 	}
 
