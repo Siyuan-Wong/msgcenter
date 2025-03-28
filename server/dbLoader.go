@@ -17,7 +17,6 @@ func (s *Server) dbLoader() {
 		panic(err)
 	}
 
-	// 2. 配置连接池
 	db := drv.DB()
 
 	// 设置默认值
@@ -51,16 +50,13 @@ func (s *Server) closeDb() {
 			panic(err)
 		}
 	}
-	s.dbLoader()
 }
 
 func (s *Server) updateDbClient() {
 	if s.DbClient != nil {
-		err := s.DbClient.Close()
-		if err != nil {
-			slog.Error("关闭数据库连接失败", "err", err)
-		}
+		s.closeDb()
 	}
+	s.dbLoader()
 }
 
 func (s *Server) registerDbClientUpdate() {

@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/redis/go-redis/v9"
 	"log/slog"
 	"msgcenter/app"
 	"msgcenter/config"
@@ -14,6 +15,7 @@ type Server struct {
 	LocalConfig *config.Config
 	Consul      *consul.Client
 	DbClient    *ent.Client
+	RedisClient *redis.Client
 	Service     *app.ServiceApp
 }
 
@@ -24,6 +26,9 @@ func NewServer() *Server {
 func (s *Server) init() *Server {
 	s.staticConfigLoader()
 	s.consulLoader()
+	s.redisLoader()
+	s.registerRedisClientUpdate()
+
 	s.dbLoader()
 	s.registerDbClientUpdate()
 	s.serviceLoader()

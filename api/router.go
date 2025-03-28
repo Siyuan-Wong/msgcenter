@@ -7,4 +7,5 @@ import (
 
 func InitRouter(app *fiber.App) {
 	handler.InitHealth(app)
+	handler.InitUser(app)
 }

@@ -12,4 +12,5 @@ consul:
     - AppServer
   keys:
     - datacenter/sqldb
+    - datacenter/redis
 ip: 196.168.1.43:8080
