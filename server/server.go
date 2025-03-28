@@ -3,7 +3,9 @@ package server
 import (
 	"github.com/gofiber/fiber/v2"
 	"log/slog"
+	"msgcenter/app"
 	"msgcenter/config"
+	"msgcenter/ent"
 	"msgcenter/platform/consul"
 )
 
@@ -11,6 +13,8 @@ type Server struct {
 	App         *fiber.App
 	LocalConfig *config.Config
 	Consul      *consul.Client
+	DbClient    *ent.Client
+	Service     *app.ServiceApp
 }
 
 func NewServer() *Server {
@@ -18,12 +22,14 @@ func NewServer() *Server {
 }
 
 func (s *Server) init() *Server {
-	s.fiberLoader()
 	s.staticConfigLoader()
 	s.consulLoader()
 	s.dbLoader()
-	return s
+	s.registerDbClientUpdate()
+	s.serviceLoader()
+	s.fiberLoader()
 
+	return s
 }
 
 func (s *Server) Start() {

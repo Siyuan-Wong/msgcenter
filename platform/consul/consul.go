@@ -20,6 +20,10 @@ type WatchConfig struct {
 	Keys     []string `yaml:"keys"`
 }
 
+const (
+	Sqldb = "datacenter/sqldb"
+)
+
 type Client struct {
 	mu               sync.RWMutex
 	client           *api.Client
@@ -405,7 +409,7 @@ func keys[K comparable, V any](m map[K]V) []K {
 
 func (c *Client) GetSqldb() config.SqlDb {
 	var sqldb config.SqlDb
-	err := sonic.Unmarshal(c.GetConfigValue("datacenter/sqldb"), &sqldb)
+	err := sonic.Unmarshal(c.GetConfigValue(Sqldb), &sqldb)
 	if err != nil {
 		slog.Error(err.Error())
 		panic(err)

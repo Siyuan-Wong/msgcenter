@@ -3,15 +3,17 @@ package config
 import "fmt"
 
 type SqlDb struct {
-	Host         string `json:"host"`
-	Port         string `json:"port"`
-	User         string `json:"user"`
-	Password     string `json:"password"`
-	Database     string `json:"database"`
-	Schema       string `json:"schema"`
-	MaxIdleConns int    `json:"max_idle_conns"`
-	MaxOpenConns int    `json:"max_open_conns"`
-	SSLMode      string `json:"ssl_mode"`
+	Host            string `json:"host"`
+	Port            string `json:"port"`
+	User            string `json:"user"`
+	Password        string `json:"password"`
+	Database        string `json:"database"`
+	Schema          string `json:"schema"`
+	MaxIdleConns    int    `json:"max_idle_conns"`
+	MaxOpenConns    int    `json:"max_open_conns"`
+	ConnMaxLifetime int    `json:"conn_max_lifetime"`
+	ConnMaxIdleTime int    `json:"conn_max_idle_time"`
+	SSLMode         string `json:"ssl_mode"`
 }
 
 func (c *SqlDb) Dsn() string {

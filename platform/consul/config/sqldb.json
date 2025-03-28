@@ -1,11 +1,13 @@
 {
   "host": "localhost",
-  "port": 5432,
+  "port": "5432",
   "user": "postgres",
   "password": "Wsymt1203.",
   "database": "postgres",
   "schema": "public",
   "max_idle_conns": 10,
   "max_open_conns": 100,
+  "conn_max_lifetime": 300,
+  "conn_max_idle_time": 1800,
   "ssl_mode": "disable"
 }

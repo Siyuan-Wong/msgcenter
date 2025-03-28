@@ -9,3 +9,7 @@ func InitHealth(app *fiber.App) {
 func health(c *fiber.Ctx) error {
 	return c.SendStatus(200)
 }
+
+func InstanceInfo(c *fiber.Ctx) error {
+
+}
