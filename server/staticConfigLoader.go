@@ -12,5 +12,4 @@ func (s *Server) staticConfigLoader() {
 		panic(err)
 	}
 	s.LocalConfig = config.GlobalConfig
-	slog.Info("初始化配置成功", slog.Any("config", s.LocalConfig))
 }

@@ -3,9 +3,9 @@ package server
 import (
 	"entgo.io/ent/dialect/sql"
 	_ "github.com/lib/pq"
-	"log/slog"
-	"msgcenter/ent"
+	"go.uber.org/zap"
 	"msgcenter/platform/consul"
+	"msgcenter/platform/ent/gen"
 	"time"
 )
 
@@ -13,7 +13,9 @@ func (s *Server) dbLoader() {
 	cfg := s.Consul.GetSqldb()
 	drv, err := sql.Open("postgres", cfg.Dsn())
 	if err != nil {
-		slog.Error("数据库连接失败", "err", err)
+		s.Logger.Error("数据库连接失败",
+			zap.Error(err),
+		)
 		panic(err)
 	}
 
@@ -39,14 +41,16 @@ func (s *Server) dbLoader() {
 	db.SetConnMaxIdleTime(time.Duration(cfg.ConnMaxIdleTime) * time.Second)
 
 	// 3. 创建 Ent 客户端
-	s.DbClient = ent.NewClient(ent.Driver(drv))
+	s.DbClient = gen.NewClient(gen.Driver(drv))
 }
 
-func (s *Server) closeDb() {
+func (s *Server) CloseDb() {
 	if s.DbClient != nil {
 		err := s.DbClient.Close()
 		if err != nil {
-			slog.Error("关闭数据库连接失败", "err", err)
+			s.Logger.Error("关闭数据库连接失败",
+				zap.Error(err),
+			)
 			panic(err)
 		}
 	}
@@ -54,15 +58,18 @@ func (s *Server) closeDb() {
 
 func (s *Server) updateDbClient() {
 	if s.DbClient != nil {
-		s.closeDb()
+		s.CloseDb()
 	}
 	s.dbLoader()
 }
 
 func (s *Server) registerDbClientUpdate() {
 	s.Consul.RegisterCallback(consul.Sqldb, func(oldData, newData []byte) {
-		slog.Info("数据库配置更新", "old", string(oldData), "new", string(newData))
+		s.Logger.Info("数据库配置更新",
+			zap.ByteString("old", oldData),
+			zap.ByteString("new", newData),
+		)
 		s.updateDbClient()
-		slog.Info("数据库配置更新完成")
+		s.Logger.Info("数据库配置更新完成")
 	})
 }

@@ -1,48 +1,65 @@
 package banner
 
 import (
-	"fmt"
 	"github.com/common-nighthawk/go-figure"
-	"log/slog"
-	"os"
+	"go.uber.org/zap"
 	"time"
 )
 
-func Show(appName string, flag string, ip string, pid int, handlerList []string) {
-	// 创建 slog 日志记录器
-	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-		Level: slog.LevelInfo,
-	}))
+func Show(appName string, flag string, ip string, pid int, handlerList []string, logger *zap.Logger) {
 
 	// 使用 go-figure 创建 ASCII art 标题
 	title := figure.NewFigure(appName, "", true)
 	title.Print()
 
-	// 打印基本信息
-	fmt.Println()
-	fmt.Printf("➜ %s\n", flag)
-	fmt.Printf("➜ PID: %d\n", pid)
-	fmt.Printf("➜ Time: %s\n", time.Now().Format("2006-01-02 15:04:05"))
-	fmt.Printf("➜ Listening on: http://%s\n", ip)
-	fmt.Println()
+	now := time.Now()
 
-	// 使用 slog 记录日志
+	// 打印基本信息
+	logger.Info("") // 空行
+	logger.Info("➜ " + flag)
+	logger.Info("➜ ", zap.Int("PID", pid))
+	logger.Info("➜ ", zap.String("Time", now.Format("2006-01-02 15:04:05")))
+	logger.Info("➜ ", zap.String("Listening on", "http://"+ip))
+	logger.Info("") // 空行
+
 	logger.Info("Application starting",
-		"name", appName,
-		"flag", flag,
-		"pid", pid,
-		"address", fmt.Sprintf("%s", ip),
-		"startTime", time.Now().Format(time.RFC3339),
+		zap.String("name", appName),
+		zap.String("flag", flag),   // Assuming flag is boolean, adjust type if needed
+		zap.Int("pid", pid),        // Assuming pid is int, adjust type if needed
+		zap.String("address", ip),  // More efficient than fmt.Sprintf
+		zap.Time("startTime", now), // zap will format time appropriately
 	)
 
 	// 打印路由列表
 	if len(handlerList) > 0 {
-		fmt.Println("Registered routes:")
-		for _, route := range handlerList {
-			fmt.Printf("  - %s\n", route)
-		}
-		fmt.Println()
+		// 先打印美观的标题
+		logger.Info("Registered routes:")
 
-		logger.Info("Registered routes", "count", len(handlerList))
+		// 为每个路由单独记录一行
+		for _, route := range handlerList {
+			logger.Info("  → " + route) // 使用统一前缀保持美观
+		}
+
+		// 同时保留结构化数据（可选）
+		logger.Debug("Routes details",
+			zap.Int("count", len(handlerList)),
+			zap.Strings("routes", handlerList),
+		)
 	}
+
+	banner := generateCoolBanner(appName)
+
+	logger.Info(banner)
+}
+
+func generateCoolBanner(appName string) string {
+	banner := `
+╔══════════════════════════════════════════╗
+║                                          ║
+║    🚀 ` + appName + ` 服务已成功启动! 🚀        ║
+║                                          ║
+╚══════════════════════════════════════════╝
+======================================================================
+`
+	return banner
 }

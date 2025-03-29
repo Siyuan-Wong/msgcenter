@@ -7,7 +7,7 @@ import (
 )
 
 func (s *Server) consulLoader() {
-	client, err := consul.NewClient(s.LocalConfig.Consul.Host)
+	client, err := consul.NewClient(s.LocalConfig.Consul.Host, s.Logger)
 	if err != nil {
 		slog.Error("初始化consul失败", err)
 		panic(err)
@@ -15,12 +15,12 @@ func (s *Server) consulLoader() {
 	s.Consul = client
 
 	err = s.Consul.RegisterService(&consulapi.AgentServiceRegistration{
-		ID:   s.LocalConfig.Consul.Service.Id,
+		ID:   s.LocalConfig.Consul.Service.ID,
 		Name: s.LocalConfig.Consul.Service.Name,
 		Port: s.LocalConfig.Consul.Service.Port,
 		Tags: s.LocalConfig.Consul.Service.Tags,
 		Check: &consulapi.AgentServiceCheck{
-			HTTP:     "http://" + s.LocalConfig.Ip + "/health", // 健康检查端点
+			HTTP:     "http://" + s.LocalConfig.IP + "/health", // 健康检查端点
 			Method:   "GET",                                    // 请求方法
 			Interval: "10s",                                    // 检查间隔
 			Timeout:  "3s",                                     // 超时时间
@@ -46,4 +46,13 @@ func (s *Server) consulLoader() {
 	})
 
 	slog.Info("开始监听consul服务", slog.Any("services", s.LocalConfig.Consul.Services))
+}
+
+func (s *Server) DeregisterConsul() {
+	if s.Consul != nil {
+		err := s.Consul.DeregisterService(s.LocalConfig.Consul.Service.ID)
+		if err != nil {
+			return
+		}
+	}
 }

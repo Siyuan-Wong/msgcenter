@@ -1,7 +1,10 @@
 package main
 
-import "msgcenter/server"
+import (
+	"msgcenter/server"
+)
 
 func main() {
-	server.NewServer().Start()
+	exitLoader()
+	server.GetServer().Start()
 }

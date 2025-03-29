@@ -20,24 +20,33 @@ var (
 	watcher         *fsnotify.Watcher
 )
 
+type ConsulConfig struct {
+	Host       string `yaml:"host"`
+	Datacenter string `yaml:"datacenter"`
+	Service    struct {
+		Name string   `yaml:"name"`
+		Tags []string `yaml:"tags"`
+		Port int      `yaml:"port"`
+		ID   string   `yaml:"id"`
+	} `yaml:"service"`
+	Services []string `yaml:"services"`
+	Keys     []string `yaml:"keys"`
+}
+
+type LogConfig struct {
+	Debug      bool   `yaml:"debug"`
+	Dir        string `yaml:"log_dir"`
+	MaxSize    int    `yaml:"log_max_size"`
+	MaxBackups int    `yaml:"log_max_backups"`
+	MaxAge     int    `yaml:"log_max_age"`
+	Compress   bool   `yaml:"log_compress"`
+}
+
 type Config struct {
 	Consul ConsulConfig `yaml:"consul"`
-	Ip     string       `yaml:"ip"`
-}
-
-type ConsulConfig struct {
-	Host       string        `yaml:"host"`
-	Datacenter string        `yaml:"datacenter"`
-	Service    ServiceConfig `yaml:"service"`
-	Services   []string      `yaml:"services"`
-	Keys       []string      `yaml:"keys"`
-}
-
-type ServiceConfig struct {
-	Name string   `yaml:"name"`
-	Tags []string `yaml:"tags"`
-	Port int      `yaml:"port"`
-	Id   string   `yaml:"id"`
+	IP     string       `yaml:"ip"`
+	Env    string       `yaml:"env"`
+	Log    LogConfig    `yaml:"log"`
 }
 
 func Init() error {

@@ -14,3 +14,12 @@ consul:
     - datacenter/sqldb
     - datacenter/redis
 ip: 196.168.1.43:8080
+env: development
+log:
+  debug: true
+  log_dir: "./logs"
+  log_max_size: 10
+  log_max_backups: 3
+  log_max_age: 7
+  log_compress: false
+

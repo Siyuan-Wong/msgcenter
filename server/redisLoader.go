@@ -20,7 +20,7 @@ func (s *Server) redisLoader() {
 	slog.Info("redis已加载", slog.Any("cfg", cfg))
 }
 
-func (s *Server) closeRedis() {
+func (s *Server) CloseRedis() {
 	err := s.RedisClient.Close()
 	if err != nil {
 		slog.Error("redis已关闭", err.Error())
@@ -29,7 +29,7 @@ func (s *Server) closeRedis() {
 }
 
 func (s *Server) updateRedisClient() {
-	s.closeRedis()
+	s.CloseRedis()
 	s.redisLoader()
 }
 

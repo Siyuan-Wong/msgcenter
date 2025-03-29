@@ -12,5 +12,5 @@ func (s *Server) loadBanner() {
 	for _, route := range routes {
 		routeUrls = append(routeUrls, route.Path+"-"+route.Method+"("+route.Name+")")
 	}
-	banner.Show(bannerCfg.AppName, bannerCfg.Flag, s.LocalConfig.Ip, os.Getpid(), routeUrls)
+	banner.Show(bannerCfg.AppName, bannerCfg.Flag, s.LocalConfig.IP, os.Getpid(), routeUrls, s.Logger)
 }

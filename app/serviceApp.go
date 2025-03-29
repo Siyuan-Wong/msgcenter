@@ -3,8 +3,8 @@ package app
 import (
 	"github.com/redis/go-redis/v9"
 	"msgcenter/config"
-	"msgcenter/ent"
 	"msgcenter/platform/consul"
+	"msgcenter/platform/ent/gen"
 	"sync"
 )
 
@@ -15,12 +15,12 @@ var (
 
 type ServiceApp struct {
 	LocalConfig *config.Config
-	DbClient    *ent.Client
+	DbClient    *gen.Client
 	Consul      *consul.Client
 	RedisClient *redis.Client
 }
 
-func GetService(localConfig *config.Config, dbClient *ent.Client, consul *consul.Client, redisClient *redis.Client) *ServiceApp {
+func GetService(localConfig *config.Config, dbClient *gen.Client, consul *consul.Client, redisClient *redis.Client) *ServiceApp {
 	once.Do(func() {
 		instance = &ServiceApp{
 			LocalConfig: localConfig,
