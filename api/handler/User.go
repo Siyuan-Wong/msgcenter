@@ -6,9 +6,19 @@ import (
 )
 
 func InitUser(app *fiber.App) {
-	app.Get("/user", createUserDemo)
+	app.Get("/user", createUserDemo).Name("demo")
 }
 
 func createUserDemo(c *fiber.Ctx) error {
-	return userService.USER().InsertDemo(c.Context())
+	err := userService.USER().InsertDemo()
+	if err != nil {
+		return c.JSON(fiber.Map{
+			"code": 500,
+			"msg":  err.Error(),
+		})
+	}
+	return c.JSON(fiber.Map{
+		"code": 200,
+		"msg":  "success",
+	})
 }

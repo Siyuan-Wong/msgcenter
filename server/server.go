@@ -34,6 +34,7 @@ func (s *Server) init() *Server {
 	s.serviceLoader()
 	s.fiberLoader()
 
+	s.loadBanner()
 	return s
 }
 

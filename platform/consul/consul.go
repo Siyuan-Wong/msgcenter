@@ -21,8 +21,9 @@ type WatchConfig struct {
 }
 
 const (
-	Sqldb = "datacenter/sqldb"
-	Redis = "datacenter/redis"
+	Sqldb  = "datacenter/sqldb"
+	Redis  = "datacenter/redis"
+	Banner = "datacenter/banner"
 )
 
 type Client struct {
@@ -428,4 +429,15 @@ func (c *Client) GetRedis() config.Redis {
 	}
 	slog.Info("获取配置成功", slog.Any("config", redis))
 	return redis
+}
+
+func (c *Client) GetBanner() config.Banner {
+	var banner config.Banner
+	err := sonic.Unmarshal(c.GetConfigValue(Banner), &banner)
+	if err != nil {
+		slog.Error(err.Error())
+		panic(err)
+	}
+	slog.Info("获取banner成功", slog.Any("banner", banner))
+	return banner
 }

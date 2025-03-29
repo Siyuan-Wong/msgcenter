@@ -26,7 +26,7 @@ func USER() *UserApp {
 	return instance
 }
 
-func (userApp *UserApp) InsertDemo(ctx context.Context) error {
+func (userApp *UserApp) InsertDemo() error {
 	// 插入数据
 	// 示例：
 	_, err := userApp.s.DbClient.User.Create().
@@ -34,7 +34,7 @@ func (userApp *UserApp) InsertDemo(ctx context.Context) error {
 		SetID(objectid.New()).
 		SetGender(user.GenderOTHER).
 		SetPhoneNumber("12345678900").
-		Save(ctx)
+		Save(context.Background())
 	if err != nil {
 		return err
 	}
