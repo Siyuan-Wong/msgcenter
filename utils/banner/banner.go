@@ -21,7 +21,7 @@ func Show(appName string, flag string, ip string, pid int, handlerList []string)
 	// 打印基本信息
 	fmt.Println()
 	fmt.Printf("➜ %s\n", flag)
-	fmt.Printf("➜ PID: %s\n", pid)
+	fmt.Printf("➜ PID: %d\n", pid)
 	fmt.Printf("➜ Time: %s\n", time.Now().Format("2006-01-02 15:04:05"))
 	fmt.Printf("➜ Listening on: http://%s\n", ip)
 	fmt.Println()
