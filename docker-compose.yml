@@ -1,0 +1,106 @@
+services:
+  # PostgreSQL 数据库服务（带健康检查和性能优化）
+  postgres:
+    image: postgres:latest
+    container_name: postgres_db
+    environment:
+      POSTGRES_PASSWORD: Wsymt1203.
+      POSTGRES_USER: postgres
+      POSTGRES_DB: datacenter
+      # 性能调优参数
+      POSTGRES_SHARED_BUFFERS: 256MB
+      POSTGRES_EFFECTIVE_CACHE_SIZE: 768MB
+      POSTGRES_WORK_MEM: 32MB
+      POSTGRES_MAINTENANCE_WORK_MEM: 64MB
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - pg_config:/etc/postgresql
+    restart: unless-stopped
+    shm_size: '1gb'  # 增加共享内存
+    networks:
+      - app_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d datacenter"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis 缓存服务（带密码认证和内存限制）
+  redis:
+    image: redis:latest
+    container_name: redis_cache
+    command: redis-server --appendonly yes --requirepass Wsymt1203.
+    environment:
+      REDIS_MAXMEMORY: 256mb  # 内存限制
+      REDIS_MAXMEMORY_POLICY: allkeys-lru  # 内存满时的策略
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - app_network
+    healthcheck:
+      test: [ "CMD-SHELL", "redis-cli -a Wsymt1203. ping | grep -q PONG" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  # Consul 服务发现和配置中心（带ACL安全配置）
+  consul:
+    image: hashicorp/consul:latest
+    container_name: consul_server
+    environment:
+      - HTTP_PROXY=http://127.0.0.1:8891
+      - HTTPS_PROXY=http://127.0.0.1:8891
+    ports:
+      - "8500:8500"  # Web UI端口
+      - "8600:8600/tcp"  # DNS接口
+      - "8600:8600/udp"  # DNS接口
+      - "8300:8300"  # LAN服务器RPC
+      - "8301:8301/tcp"  # LAN Serf
+      - "8301:8301/udp"  # LAN Serf
+      - "8302:8302/tcp"  # WAN Serf
+      - "8302:8302/udp"  # WAN Serf
+    volumes:
+      - consul_data:/consul/data
+      - consul_config:/consul/config
+    command: "agent -server -ui -node=consul-server -bootstrap-expect=1 -client=0.0.0.0"
+    restart: unless-stopped
+    networks:
+      - app_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8500/v1/status/leader"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"  # 暴露Go服务端口
+    environment:
+      - APP_ENV=production
+    restart: unless-stopped
+    volumes:
+      - ./:/app  # 开发时挂载代码（生产环境应移除）
+
+volumes:
+  pg_data:
+  pg_config:
+  redis_data:
+  consul_data:
+  consul_config:
+
+networks:
+  app_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+          gateway: 172.20.0.1
