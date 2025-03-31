@@ -1,14 +1,13 @@
-package main
+package server
 
 import (
 	"github.com/tebeka/atexit"
-	"msgcenter/server"
 	"os"
 	"os/signal"
 	"syscall"
 )
 
-func exitLoader() {
+func ExitLoader() {
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
 
@@ -20,7 +19,7 @@ func exitLoader() {
 }
 
 func cleanUp() {
-	s := server.GetServer()
+	s := GetServer()
 	s.Logger.Info("服务已退出")
 	s.DeregisterConsul()
 	s.Logger.Info("服务已从consul注销")

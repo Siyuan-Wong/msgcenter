@@ -5,6 +5,5 @@ import (
 )
 
 func main() {
-	exitLoader()
 	server.GetServer().Start()
 }

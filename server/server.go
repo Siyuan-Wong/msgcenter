@@ -50,6 +50,7 @@ func (s *Server) init() *Server {
 }
 
 func (s *Server) Start() {
+	ExitLoader()
 	s.init()
 	err := s.App.Listen(s.LocalConfig.IP)
 	if err != nil {
